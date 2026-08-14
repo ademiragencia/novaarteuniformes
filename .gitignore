@@ -1,0 +1,23 @@
+node_modules
+dist
+.output
+.vercel
+.tanstack
+.nitro
+*.local
+.env
+.env.*
+!.env.example
+
+# sandbox / agent
+.grok
+artifacts
+attachments
+screenshots
+.node_modules.lock
+
+# logs / os
+*.log
+.DS_Store
+tmp
+/tmp
