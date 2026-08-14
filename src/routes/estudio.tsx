@@ -28,11 +28,11 @@ function Estudio() {
           Estúdio
         </p>
         <h1 className="mt-2 max-w-2xl font-display text-4xl tracking-tight sm:text-5xl">
-          Monte a peça e veja como fica.
+          Suba a arte, escolha o lugar, veja a peça.
         </h1>
         <p className="mt-4 max-w-xl text-ink-soft">
-          Cor, texto, logo e técnica na hora. Quando a arte estiver certa, o orçamento
-          segue no WhatsApp com a grade pronta.
+          Envie o logo, marque peito, costas ou nuca e gere a visualização da
+          camiseta, polo ou moletom com a sua marca aplicada.
         </p>
         <div className="mt-10">
           <StudioApp />

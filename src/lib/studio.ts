@@ -13,6 +13,7 @@ export type TextLayer = {
   y: number;
   scale: number;
   rotation: number;
+  placementId?: string;
 };
 
 export type ImageLayer = {
@@ -24,6 +25,8 @@ export type ImageLayer = {
   y: number;
   scale: number;
   rotation: number;
+  placementId?: string;
+  name?: string;
 };
 
 export type StudioLayer = TextLayer | ImageLayer;
@@ -71,6 +74,89 @@ export const GARMENTS: Garment[] = [
     printBack: { x: 0.28, y: 0.22, w: 0.44, h: 0.36 },
   },
 ];
+
+export type Placement = {
+  id: string;
+  label: string;
+  hint: string;
+  side: Side;
+  x: number;
+  y: number;
+  scale: number;
+  overrides?: Record<string, Partial<Pick<Placement, "x" | "y" | "scale">>>;
+};
+
+export const PLACEMENTS: Placement[] = [
+  {
+    id: "chest-left",
+    label: "Peito esquerdo",
+    hint: "Logo pequeno, o clássico da polo",
+    side: "front",
+    x: 0.62,
+    y: 0.34,
+    scale: 0.5,
+    overrides: {
+      polo: { x: 0.64, y: 0.36, scale: 0.42 },
+      hoodie: { x: 0.62, y: 0.3, scale: 0.46 },
+    },
+  },
+  {
+    id: "chest-center",
+    label: "Peito centro",
+    hint: "Marca na altura do peito",
+    side: "front",
+    x: 0.5,
+    y: 0.4,
+    scale: 0.9,
+    overrides: {
+      polo: { y: 0.42, scale: 0.78 },
+      hoodie: { y: 0.33, scale: 0.72 },
+    },
+  },
+  {
+    id: "front-full",
+    label: "Frente grande",
+    hint: "Estampa de camiseta",
+    side: "front",
+    x: 0.5,
+    y: 0.46,
+    scale: 1.4,
+    overrides: {
+      polo: { y: 0.46, scale: 1.15 },
+      hoodie: { y: 0.36, scale: 1.05 },
+    },
+  },
+  {
+    id: "back-center",
+    label: "Costas",
+    hint: "Arte nas costas, tamanho cheio",
+    side: "back",
+    x: 0.5,
+    y: 0.4,
+    scale: 1.45,
+    overrides: {
+      hoodie: { y: 0.38, scale: 1.25 },
+    },
+  },
+  {
+    id: "back-neck",
+    label: "Nuca",
+    hint: "Marca pequena abaixo da gola",
+    side: "back",
+    x: 0.5,
+    y: 0.27,
+    scale: 0.42,
+    overrides: {
+      hoodie: { y: 0.24, scale: 0.4 },
+    },
+  },
+];
+
+export function resolvePlacement(id: string, garmentId: string) {
+  const base = PLACEMENTS.find((p) => p.id === id);
+  if (!base) return null;
+  return { ...base, ...base.overrides?.[garmentId] };
+}
 
 export const GARMENT_COLORS = [
   { name: "Branco", hex: "#F4F1EA" },

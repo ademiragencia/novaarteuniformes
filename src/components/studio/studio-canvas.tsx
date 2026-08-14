@@ -1,97 +1,13 @@
 import { useEffect, useRef } from "react";
-import {
-  type ImageLayer,
-  type StudioLayer,
-  type TextLayer,
-  getGarment,
-  tintWhiteGarment,
-} from "@/lib/studio";
+import { PLACEMENTS, getGarment, resolvePlacement } from "@/lib/studio";
+import { hitTest, loadImage, renderGarmentSide } from "@/lib/studio-render";
 import { useStudio } from "@/lib/studio-store";
 
-const imageCache = new Map<string, HTMLImageElement>();
-
-function loadImage(src: string) {
-  const hit = imageCache.get(src);
-  if (hit && hit.complete) return Promise.resolve(hit);
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => {
-      imageCache.set(src, img);
-      resolve(img);
-    };
-    img.onerror = reject;
-    img.src = src;
-  });
-}
-
-function drawLayer(
-  ctx: CanvasRenderingContext2D,
-  layer: StudioLayer,
-  w: number,
-  h: number,
-  selected: boolean,
-) {
-  ctx.save();
-  ctx.translate(layer.x * w, layer.y * h);
-  ctx.rotate((layer.rotation * Math.PI) / 180);
-  ctx.scale(layer.scale, layer.scale);
-
-  if (layer.type === "text") {
-    const t = layer as TextLayer;
-    ctx.font = `700 ${Math.round(w * 0.055)}px "${t.font}", sans-serif`;
-    ctx.fillStyle = t.fill;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(t.text, 0, 0);
-    if (selected) {
-      const m = ctx.measureText(t.text);
-      const tw = m.width + 16;
-      const th = w * 0.07;
-      ctx.strokeStyle = "#1c3a2e";
-      ctx.lineWidth = 1.5 / layer.scale;
-      ctx.setLineDash([5 / layer.scale, 4 / layer.scale]);
-      ctx.strokeRect(-tw / 2, -th / 2, tw, th);
-    }
-  } else {
-    const im = imageCache.get((layer as ImageLayer).src);
-    if (im) {
-      const iw = w * 0.28;
-      const ih = iw * (im.naturalHeight / im.naturalWidth || 1);
-      ctx.drawImage(im, -iw / 2, -ih / 2, iw, ih);
-      if (selected) {
-        ctx.strokeStyle = "#1c3a2e";
-        ctx.lineWidth = 1.5 / layer.scale;
-        ctx.setLineDash([5 / layer.scale, 4 / layer.scale]);
-        ctx.strokeRect(-iw / 2, -ih / 2, iw, ih);
-      }
-    }
-  }
-  ctx.restore();
-}
-
-function hitTest(
-  layer: StudioLayer,
-  mx: number,
-  my: number,
-  w: number,
-  h: number,
-) {
-  const dx = mx - layer.x * w;
-  const dy = my - layer.y * h;
-  const rad = (-layer.rotation * Math.PI) / 180;
-  const lx = (dx * Math.cos(rad) - dy * Math.sin(rad)) / layer.scale;
-  const ly = (dx * Math.sin(rad) + dy * Math.cos(rad)) / layer.scale;
-  if (layer.type === "text") {
-    const tw = w * 0.22 * Math.max(0.4, layer.text.length / 8);
-    const th = w * 0.07;
-    return Math.abs(lx) < tw / 2 && Math.abs(ly) < th / 2;
-  }
-  const iw = w * 0.14;
-  return Math.abs(lx) < iw && Math.abs(ly) < iw;
-}
-
-export function StudioCanvas() {
+export function StudioCanvas({
+  placeMode = false,
+}: {
+  placeMode?: boolean;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const garmentId = useStudio((s) => s.garmentId);
@@ -99,21 +15,22 @@ export function StudioCanvas() {
   const side = useStudio((s) => s.side);
   const layers = useStudio((s) => s.layers);
   const selectedId = useStudio((s) => s.selectedId);
+  const placements = useStudio((s) => s.placements);
+  const artwork = useStudio((s) => s.artwork);
   const select = useStudio((s) => s.select);
   const updateLayer = useStudio((s) => s.updateLayer);
+  const togglePlacement = useStudio((s) => s.togglePlacement);
   const drag = useRef<{ id: string; ox: number; oy: number } | null>(null);
-  const tinted = useRef<HTMLCanvasElement | null>(null);
-  const tintKey = useRef("");
 
   useEffect(() => {
     let cancelled = false;
-    const garment = getGarment(garmentId);
-    const src = side === "front" ? garment.front : garment.back;
 
     async function paint() {
       const canvas = canvasRef.current;
       const wrap = wrapRef.current;
       if (!canvas || !wrap) return;
+      const garment = getGarment(garmentId);
+      const src = side === "front" ? garment.front : garment.back;
       const img = await loadImage(src);
       if (cancelled) return;
 
@@ -122,6 +39,20 @@ export function StudioCanvas() {
       const w = Math.min(maxW, 720);
       const h = Math.round(w * ratio);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      const painted = await renderGarmentSide({
+        garmentId,
+        color,
+        side,
+        layers,
+        width: w,
+        showGuides: !placeMode,
+        selectedId: placeMode ? null : selectedId,
+        showHotspots: placeMode,
+        activePlacements: placements,
+      });
+      if (cancelled) return;
+
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       canvas.style.width = `${w}px`;
@@ -129,35 +60,8 @@ export function StudioCanvas() {
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-      const key = `${src}|${color}|${w}x${h}`;
-      if (tintKey.current !== key || !tinted.current) {
-        tinted.current = tintWhiteGarment(img, w, h, color);
-        tintKey.current = key;
-      }
       ctx.clearRect(0, 0, w, h);
-      ctx.drawImage(tinted.current, 0, 0, w, h);
-
-      const print = side === "front" ? garment.print : garment.printBack;
-      ctx.save();
-      ctx.strokeStyle = "rgba(28,58,46,0.28)";
-      ctx.setLineDash([6, 5]);
-      ctx.lineWidth = 1;
-      ctx.strokeRect(print.x * w, print.y * h, print.w * w, print.h * h);
-      ctx.restore();
-
-      const visible = layers.filter((l) => l.side === side);
-      for (const layer of visible) {
-        if (layer.type === "image") {
-          try {
-            await loadImage(layer.src);
-          } catch {
-            /* skip */
-          }
-        }
-        if (cancelled) return;
-        drawLayer(ctx, layer, w, h, layer.id === selectedId);
-      }
+      ctx.drawImage(painted, 0, 0, w, h);
     }
 
     void paint();
@@ -167,7 +71,7 @@ export function StudioCanvas() {
       cancelled = true;
       ro.disconnect();
     };
-  }, [garmentId, color, side, layers, selectedId]);
+  }, [garmentId, color, side, layers, selectedId, placeMode, placements]);
 
   function localPoint(e: React.PointerEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;
@@ -183,13 +87,27 @@ export function StudioCanvas() {
 
   function onPointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     const { x, y, w, h } = localPoint(e);
+    if (placeMode) {
+      const hit = PLACEMENTS.filter((p) => p.side === side).find((p) => {
+        const r = resolvePlacement(p.id, garmentId);
+        if (!r) return false;
+        const dx = x - r.x * w;
+        const dy = y - r.y * h;
+        return Math.hypot(dx, dy) < 22;
+      });
+      if (hit) {
+        if (!artwork) return;
+        togglePlacement(hit.id);
+      }
+      return;
+    }
     const visible = [...useStudio.getState().layers]
       .filter((l) => l.side === side)
       .reverse();
-    const hit = visible.find((l) => hitTest(l, x, y, w, h));
-    if (hit) {
-      select(hit.id);
-      drag.current = { id: hit.id, ox: x - hit.x * w, oy: y - hit.y * h };
+    const found = visible.find((l) => hitTest(l, x, y, w, h));
+    if (found) {
+      select(found.id);
+      drag.current = { id: found.id, ox: x - found.x * w, oy: y - found.y * h };
       (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
     } else {
       select(null);
@@ -197,7 +115,7 @@ export function StudioCanvas() {
   }
 
   function onPointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (!drag.current) return;
+    if (!drag.current || placeMode) return;
     const { x, y, w, h } = localPoint(e);
     updateLayer(drag.current.id, {
       x: Math.min(0.86, Math.max(0.14, (x - drag.current.ox) / w)),
@@ -210,7 +128,7 @@ export function StudioCanvas() {
   }
 
   function onWheel(e: React.WheelEvent<HTMLCanvasElement>) {
-    if (!selectedId) return;
+    if (placeMode || !selectedId) return;
     e.preventDefault();
     const layer = layers.find((l) => l.id === selectedId);
     if (!layer) return;
