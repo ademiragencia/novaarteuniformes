@@ -9,34 +9,12 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { PROCESS, TESTIMONIALS, WORKS } from "@/lib/content";
 import { CATEGORIES, PRODUCTS } from "@/lib/products";
 import { SITE } from "@/lib/site";
 import { formatBRL } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({ component: Home });
-
-const STEPS = [
-  {
-    n: "01",
-    title: "Escolha a peça",
-    body: "Camiseta, polo ou moletom. Cor, modelagem e tecido certos para o uso.",
-  },
-  {
-    n: "02",
-    title: "Monte no estúdio",
-    body: "Texto, logo e posição. Você vê a arte na peça antes de falar com a gente.",
-  },
-  {
-    n: "03",
-    title: "Fecha a grade",
-    body: "Tamanhos da equipe, mínimo de 10 peças. A produção confirma o orçamento.",
-  },
-  {
-    n: "04",
-    title: "Costura e envio",
-    body: "Silk, DTF, bordado ou sublimação. Sai de Betim para o Brasil e para fora.",
-  },
-];
 
 const FAQS = [
   {
@@ -49,15 +27,15 @@ const FAQS = [
   },
   {
     q: "Posso mandar minha arte?",
-    a: "Sim. Suba o arquivo no estúdio ou envie em PDF, PNG ou AI. Se ainda não tem marca, desenhamos a aplicação com você.",
+    a: "Sim. Suba o arquivo no estúdio ou envie em PDF, PNG ou AI. O fundo branco a gente tira. Se ainda não tem marca, desenhamos a aplicação com você.",
   },
   {
     q: "Qual técnica escolher?",
     a: "Silk para volume e 1–4 cores. DTF para foto e degradê. Bordado para polo e uniforme de presença. Sublimação para dry fit e peça inteira.",
   },
   {
-    q: "Vocês entregam fora de Minas?",
-    a: "Sim. Enviamos para todo o Brasil. Temos clientes nos EUA, Canadá, Portugal e França — o pedido fecha aqui em Betim.",
+    q: "Como pago e como chega?",
+    a: "Pix ou transferência: 50% para iniciar, 50% na retirada ou no envio. Retira em Betim ou mandamos para o Brasil. Exterior combina o despacho no orçamento.",
   },
   {
     q: "Dá para personalizar uma peça só?",
@@ -66,7 +44,11 @@ const FAQS = [
 ];
 
 function Home() {
-  const featured = PRODUCTS.slice(0, 6);
+  const featured = PRODUCTS.filter((p) =>
+    ["camiseta-cotton", "polo-piquet", "moletom-canguru", "dry-fit", "camiseta-time", "bone-logo"].includes(
+      p.id,
+    ),
+  );
 
   return (
     <SiteShell>
@@ -99,12 +81,12 @@ function Home() {
                 <dd className="mt-1 font-display text-2xl">{SITE.minPieces} pç</dd>
               </div>
               <div>
-                <dt className="text-[0.68rem] tracking-[0.16em] text-muted uppercase">Técnicas</dt>
-                <dd className="mt-1 font-display text-2xl">4</dd>
+                <dt className="text-[0.68rem] tracking-[0.16em] text-muted uppercase">Prazo</dt>
+                <dd className="mt-1 font-display text-2xl">7–12 d</dd>
               </div>
               <div>
-                <dt className="text-[0.68rem] tracking-[0.16em] text-muted uppercase">Envio</dt>
-                <dd className="mt-1 font-display text-2xl">BR+</dd>
+                <dt className="text-[0.68rem] tracking-[0.16em] text-muted uppercase">Pagamento</dt>
+                <dd className="mt-1 font-display text-2xl">Pix</dd>
               </div>
             </dl>
           </div>
@@ -168,9 +150,7 @@ function Home() {
                   <p className="font-medium">{p.name}</p>
                   <p className="mt-0.5 text-sm text-muted">{p.blurb}</p>
                 </div>
-                <p className="shrink-0 text-sm text-ink-soft">
-                  {formatBRL(p.priceFrom)}
-                </p>
+                <p className="shrink-0 text-sm text-ink-soft">{formatBRL(p.priceFrom)}</p>
               </div>
             </Link>
           ))}
@@ -200,8 +180,7 @@ function Home() {
             </h2>
             <p className="mt-5 max-w-md text-cream/75">
               Escolha o modelo, pinte a malha, escreva o nome da casa ou suba o logo.
-              Arraste, gire, mude a técnica. Quando estiver certo, o orçamento vai
-              pronto no WhatsApp.
+              O fundo sai sozinho. Quando estiver certo, o orçamento vai pronto no WhatsApp.
             </p>
             <Button asChild size="lg" variant="cream" className="mt-8">
               <Link to="/estudio">
@@ -220,12 +199,21 @@ function Home() {
       </section>
 
       <section className="px-4 py-20 sm:px-8 lg:px-12">
-        <p className="text-[0.72rem] font-medium tracking-[0.2em] text-moss uppercase">
-          Como trabalhamos
-        </p>
-        <h2 className="mt-2 font-display text-4xl tracking-tight">Quatro passos, sem surpresa</h2>
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-[0.72rem] font-medium tracking-[0.2em] text-moss uppercase">
+              Como trabalhamos
+            </p>
+            <h2 className="mt-2 font-display text-4xl tracking-tight">Quatro passos, sem surpresa</h2>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/como-funciona">
+              Prazos e pagamento <ArrowRight />
+            </Link>
+          </Button>
+        </div>
         <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {STEPS.map((s) => (
+          {PROCESS.map((s) => (
             <li key={s.n} className="rounded-xl border border-line bg-canvas p-5">
               <p className="font-display text-3xl text-moss">{s.n}</p>
               <p className="mt-4 font-medium">{s.title}</p>
@@ -264,6 +252,52 @@ function Home() {
           <Button asChild className="mt-8 w-fit">
             <Link to="/empresas">Falar com o comercial</Link>
           </Button>
+        </div>
+      </section>
+
+      <section className="px-4 py-20 sm:px-8 lg:px-12">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="text-[0.72rem] font-medium tracking-[0.2em] text-moss uppercase">
+              Trabalhos
+            </p>
+            <h2 className="mt-2 font-display text-4xl tracking-tight">Saiu da casa</h2>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/trabalhos">
+              Ver todos <ArrowRight />
+            </Link>
+          </Button>
+        </div>
+        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {WORKS.slice(0, 4).map((w) => (
+            <Link
+              key={w.src}
+              to="/trabalhos"
+              className="group overflow-hidden rounded-xl border border-line"
+            >
+              <img
+                src={w.src}
+                alt={w.title}
+                className="aspect-[4/5] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-line bg-canvas px-4 py-20 sm:px-8 lg:px-12">
+        <h2 className="font-display text-4xl tracking-tight">Quem veste, volta.</h2>
+        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+          {TESTIMONIALS.map((t) => (
+            <blockquote key={t.name} className="rounded-xl border border-line bg-paper p-6">
+              <p className="text-ink-soft">“{t.quote}”</p>
+              <footer className="mt-5 text-sm">
+                <p className="font-medium">{t.name}</p>
+                <p className="text-muted">{t.role}</p>
+              </footer>
+            </blockquote>
+          ))}
         </div>
       </section>
 

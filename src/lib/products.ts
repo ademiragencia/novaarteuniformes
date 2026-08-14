@@ -4,7 +4,8 @@ export type CategoryId =
   | "moletons"
   | "esportivo"
   | "uniformes"
-  | "hospitalidade";
+  | "hospitalidade"
+  | "acessorios";
 
 export type TechniqueId = "silk" | "dtf" | "bordado" | "sublimacao";
 
@@ -33,6 +34,7 @@ export const CATEGORIES: { id: CategoryId; label: string; hint: string }[] = [
   { id: "esportivo", label: "Esportivo", hint: "Dry fit e UV" },
   { id: "uniformes", label: "Uniformes", hint: "Operacional e social" },
   { id: "hospitalidade", label: "Hospitalidade", hint: "Aventais e cozinha" },
+  { id: "acessorios", label: "Acessórios", hint: "Bonés" },
 ];
 
 export const PRODUCTS: Product[] = [
@@ -252,6 +254,73 @@ export const PRODUCTS: Product[] = [
     sizes: ["Único"],
     techniques: ["bordado", "silk"],
     fabric: "Brim pesado",
+    customizable: false,
+  },
+  {
+    id: "camiseta-time",
+    slug: "camiseta-time",
+    name: "Camisa de Time",
+    category: "esportivo",
+    priceFrom: 69.9,
+    blurb: "Malha de jogo, gola contrastada. O uniforme do campeonato.",
+    description:
+      "Camisa esportiva em dry fit, gola e punho em ribana. Recebe sublimação total ou DTF de escudo e número. Pedido mínimo de 10, com opção de nome nas costas.",
+    image: "/images/jersey.jpg",
+    gallery: ["/images/jersey.jpg", "/images/team-jersey.jpg", "/images/dryfit-olive.jpg"],
+    colors: [
+      { name: "Verde floresta", hex: "#1C3A2E" },
+      { name: "Royal", hex: "#1E3A8A" },
+      { name: "Preto", hex: "#1A1A1A" },
+      { name: "Branco", hex: "#F4F1EA" },
+    ],
+    sizes: ["P", "M", "G", "GG", "XG"],
+    techniques: ["sublimacao", "dtf"],
+    fabric: "Dry fit de jogo",
+    customizable: true,
+    garmentId: "tshirt",
+  },
+  {
+    id: "regata-cotton",
+    slug: "regata-cotton",
+    name: "Regata Cotton",
+    category: "camisetas",
+    priceFrom: 29.9,
+    blurb: "Algodão leve, cava ampla. Evento, academia, verão.",
+    description:
+      "Regata 100% algodão, cava confortável e gola reforçada. Boa base para silk e DTF. Pedido mínimo de 10 peças.",
+    image: "/images/tank.jpg",
+    gallery: ["/images/tank.jpg", "/mockups/tshirt-front.jpg"],
+    colors: [
+      { name: "Creme", hex: "#F4F1EA" },
+      { name: "Preto", hex: "#1A1A1A" },
+      { name: "Marinho", hex: "#1B2A4A" },
+    ],
+    sizes: ["P", "M", "G", "GG", "XG"],
+    techniques: ["silk", "dtf"],
+    fabric: "Algodão 30.1",
+    customizable: true,
+    garmentId: "tshirt",
+  },
+  {
+    id: "bone-logo",
+    slug: "bone-logo",
+    name: "Boné Logo",
+    category: "acessorios",
+    priceFrom: 32.9,
+    blurb: "Aba curva, fivela. O lugar certo para o bordado pequeno.",
+    description:
+      "Boné estruturado com aba curva e ajuste em fivela. Bordado frontal da marca. Fecha bem com polo ou camisa operacional. Pedido mínimo de 10.",
+    image: "/images/cap.jpg",
+    gallery: ["/images/cap.jpg", "/images/work-still.jpg", "/images/tech-embroidery.jpg"],
+    colors: [
+      { name: "Marinho", hex: "#1B2A4A" },
+      { name: "Preto", hex: "#1A1A1A" },
+      { name: "Verde floresta", hex: "#1C3A2E" },
+      { name: "Khaki", hex: "#C4B49A" },
+    ],
+    sizes: ["Único"],
+    techniques: ["bordado", "dtf"],
+    fabric: "Sarja / lã mista",
     customizable: false,
   },
 ];

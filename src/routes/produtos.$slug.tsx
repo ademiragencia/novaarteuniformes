@@ -74,6 +74,9 @@ function ProductPage() {
           <div className="mt-6">
             <p className="text-sm font-medium">Tamanhos</p>
             <p className="mt-1 text-sm text-muted">{product.sizes.join(" · ")}</p>
+            <Link to="/tamanhos" className="mt-2 inline-block text-sm text-forest hover:underline">
+              Ver guia de medidas
+            </Link>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-2">

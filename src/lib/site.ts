@@ -11,15 +11,24 @@ export const SITE = {
   minPieces: 10,
   hours: "Seg a sex, 8h às 18h",
   ships: "Todo o Brasil e clientes no exterior",
+  payment: "Pix ou transferência · 50% para iniciar",
+  lead: "7 a 12 dias úteis após a arte aprovada",
 } as const;
 
 export const NAV = [
   { to: "/produtos", label: "Catálogo" },
   { to: "/estudio", label: "Estúdio" },
   { to: "/empresas", label: "Empresas" },
-  { to: "/tecnicas", label: "Técnicas" },
+  { to: "/trabalhos", label: "Trabalhos" },
   { to: "/sobre", label: "A casa" },
   { to: "/contato", label: "Contato" },
+] as const;
+
+export const FOOTER_MORE = [
+  { to: "/como-funciona", label: "Como funciona" },
+  { to: "/tamanhos", label: "Guia de tamanhos" },
+  { to: "/tecnicas", label: "Técnicas" },
+  { to: "/privacidade", label: "Privacidade" },
 ] as const;
 
 export function waLink(text?: string) {

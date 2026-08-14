@@ -53,6 +53,14 @@ function Contato() {
               <dd className="mt-1 text-lg">{SITE.hours}</dd>
             </div>
             <div>
+              <dt className="text-muted">Pagamento</dt>
+              <dd className="mt-1 text-lg">{SITE.payment}</dd>
+            </div>
+            <div>
+              <dt className="text-muted">Prazo</dt>
+              <dd className="mt-1 text-lg">{SITE.lead}</dd>
+            </div>
+            <div>
               <dt className="text-muted">Instagram</dt>
               <dd className="mt-1">
                 <a href={SITE.instagramUrl} className="text-lg hover:underline">

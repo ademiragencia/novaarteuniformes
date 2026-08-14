@@ -10,19 +10,28 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComoFuncionaRouteImport } from './routes/como-funciona'
 import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EstudioRouteImport } from './routes/estudio'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as TamanhosRouteImport } from './routes/tamanhos'
 import { Route as TecnicasRouteImport } from './routes/tecnicas'
+import { Route as TrabalhosRouteImport } from './routes/trabalhos'
 import { Route as ProdutosSlugRouteImport } from './routes/produtos.$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComoFuncionaRoute = ComoFuncionaRouteImport.update({
+  id: '/como-funciona',
+  path: '/como-funciona',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContatoRoute = ContatoRouteImport.update({
@@ -45,6 +54,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProdutosRoute = ProdutosRouteImport.update({
   id: '/produtos',
   path: '/produtos',
@@ -55,9 +69,19 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TamanhosRoute = TamanhosRouteImport.update({
+  id: '/tamanhos',
+  path: '/tamanhos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TecnicasRoute = TecnicasRouteImport.update({
   id: '/tecnicas',
   path: '/tecnicas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrabalhosRoute = TrabalhosRouteImport.update({
+  id: '/trabalhos',
+  path: '/trabalhos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProdutosSlugRoute = ProdutosSlugRouteImport.update({
@@ -73,38 +97,50 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/como-funciona': typeof ComoFuncionaRoute
   '/contato': typeof ContatoRoute
   '/empresas': typeof EmpresasRoute
   '/estudio': typeof EstudioRoute
   '/login': typeof LoginRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
+  '/tamanhos': typeof TamanhosRoute
   '/tecnicas': typeof TecnicasRoute
+  '/trabalhos': typeof TrabalhosRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/como-funciona': typeof ComoFuncionaRoute
   '/contato': typeof ContatoRoute
   '/empresas': typeof EmpresasRoute
   '/estudio': typeof EstudioRoute
   '/login': typeof LoginRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
+  '/tamanhos': typeof TamanhosRoute
   '/tecnicas': typeof TecnicasRoute
+  '/trabalhos': typeof TrabalhosRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/como-funciona': typeof ComoFuncionaRoute
   '/contato': typeof ContatoRoute
   '/empresas': typeof EmpresasRoute
   '/estudio': typeof EstudioRoute
   '/login': typeof LoginRoute
+  '/privacidade': typeof PrivacidadeRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
+  '/tamanhos': typeof TamanhosRoute
   '/tecnicas': typeof TecnicasRoute
+  '/trabalhos': typeof TrabalhosRoute
   '/produtos/$slug': typeof ProdutosSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -112,50 +148,66 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/como-funciona'
     | '/contato'
     | '/empresas'
     | '/estudio'
     | '/login'
+    | '/privacidade'
     | '/produtos'
     | '/sobre'
+    | '/tamanhos'
     | '/tecnicas'
+    | '/trabalhos'
     | '/produtos/$slug'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/como-funciona'
     | '/contato'
     | '/empresas'
     | '/estudio'
     | '/login'
+    | '/privacidade'
     | '/produtos'
     | '/sobre'
+    | '/tamanhos'
     | '/tecnicas'
+    | '/trabalhos'
     | '/produtos/$slug'
     | '/api/auth/$'
   id:
     | '__root__'
     | '/'
+    | '/como-funciona'
     | '/contato'
     | '/empresas'
     | '/estudio'
     | '/login'
+    | '/privacidade'
     | '/produtos'
     | '/sobre'
+    | '/tamanhos'
     | '/tecnicas'
+    | '/trabalhos'
     | '/produtos/$slug'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComoFuncionaRoute: typeof ComoFuncionaRoute
   ContatoRoute: typeof ContatoRoute
   EmpresasRoute: typeof EmpresasRoute
   EstudioRoute: typeof EstudioRoute
   LoginRoute: typeof LoginRoute
+  PrivacidadeRoute: typeof PrivacidadeRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
+  TamanhosRoute: typeof TamanhosRoute
   TecnicasRoute: typeof TecnicasRoute
+  TrabalhosRoute: typeof TrabalhosRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -166,6 +218,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/como-funciona': {
+      id: '/como-funciona'
+      path: '/como-funciona'
+      fullPath: '/como-funciona'
+      preLoaderRoute: typeof ComoFuncionaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contato': {
@@ -196,6 +255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/produtos': {
       id: '/produtos'
       path: '/produtos'
@@ -210,11 +276,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tamanhos': {
+      id: '/tamanhos'
+      path: '/tamanhos'
+      fullPath: '/tamanhos'
+      preLoaderRoute: typeof TamanhosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tecnicas': {
       id: '/tecnicas'
       path: '/tecnicas'
       fullPath: '/tecnicas'
       preLoaderRoute: typeof TecnicasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trabalhos': {
+      id: '/trabalhos'
+      path: '/trabalhos'
+      fullPath: '/trabalhos'
+      preLoaderRoute: typeof TrabalhosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/produtos/$slug': {
@@ -248,13 +328,17 @@ const ProdutosRouteWithChildren = ProdutosRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComoFuncionaRoute: ComoFuncionaRoute,
   ContatoRoute: ContatoRoute,
   EmpresasRoute: EmpresasRoute,
   EstudioRoute: EstudioRoute,
   LoginRoute: LoginRoute,
+  PrivacidadeRoute: PrivacidadeRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,
+  TamanhosRoute: TamanhosRoute,
   TecnicasRoute: TecnicasRoute,
+  TrabalhosRoute: TrabalhosRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

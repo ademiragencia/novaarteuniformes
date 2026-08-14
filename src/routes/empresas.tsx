@@ -67,6 +67,26 @@ function Empresas() {
         ))}
       </section>
 
+      <section className="px-4 py-16 sm:px-8 lg:px-12">
+        <h2 className="font-display text-3xl tracking-tight">Volume</h2>
+        <p className="mt-2 max-w-lg text-ink-soft">
+          Quanto maior a grade, melhor o custo por peça. Guardamos tela e arquivo
+          para a reposição.
+        </p>
+        <div className="mt-8 grid gap-3 sm:grid-cols-4">
+          {[
+            ["10–19", "Tabela"],
+            ["20–49", "Melhor custo"],
+            ["50–99", "Desconto"],
+            ["100+", "Condição de empresa"],
+          ].map(([q, n]) => (
+            <div key={q} className="rounded-xl border border-line bg-canvas p-5">
+              <p className="font-display text-2xl">{q}</p>
+              <p className="mt-1 text-sm text-muted">{n}</p>
+            </div>
+          ))}
+        </div>
+      </section>
       <section className="grid gap-12 px-4 py-20 sm:px-8 lg:grid-cols-2 lg:px-12">
         <div>
           <h2 className="font-display text-3xl tracking-tight">Fale com o comercial</h2>
