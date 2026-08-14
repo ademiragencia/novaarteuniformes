@@ -1,13 +1,9 @@
 import { useEffect, useRef } from "react";
-import { PLACEMENTS, getGarment, resolvePlacement } from "@/lib/studio";
+import { getGarment } from "@/lib/studio";
 import { hitTest, loadImage, renderGarmentSide } from "@/lib/studio-render";
 import { useStudio } from "@/lib/studio-store";
 
-export function StudioCanvas({
-  placeMode = false,
-}: {
-  placeMode?: boolean;
-}) {
+export function StudioCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const garmentId = useStudio((s) => s.garmentId);
@@ -15,11 +11,8 @@ export function StudioCanvas({
   const side = useStudio((s) => s.side);
   const layers = useStudio((s) => s.layers);
   const selectedId = useStudio((s) => s.selectedId);
-  const placements = useStudio((s) => s.placements);
-  const artwork = useStudio((s) => s.artwork);
   const select = useStudio((s) => s.select);
   const updateLayer = useStudio((s) => s.updateLayer);
-  const togglePlacement = useStudio((s) => s.togglePlacement);
   const drag = useRef<{ id: string; ox: number; oy: number } | null>(null);
 
   useEffect(() => {
@@ -39,17 +32,14 @@ export function StudioCanvas({
       const w = Math.min(maxW, 720);
       const h = Math.round(w * ratio);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-
       const painted = await renderGarmentSide({
         garmentId,
         color,
         side,
         layers,
         width: w,
-        showGuides: !placeMode,
-        selectedId: placeMode ? null : selectedId,
-        showHotspots: placeMode,
-        activePlacements: placements,
+        showGuides: true,
+        selectedId,
       });
       if (cancelled) return;
 
@@ -71,7 +61,7 @@ export function StudioCanvas({
       cancelled = true;
       ro.disconnect();
     };
-  }, [garmentId, color, side, layers, selectedId, placeMode, placements]);
+  }, [garmentId, color, side, layers, selectedId]);
 
   function localPoint(e: React.PointerEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;
@@ -87,20 +77,6 @@ export function StudioCanvas({
 
   function onPointerDown(e: React.PointerEvent<HTMLCanvasElement>) {
     const { x, y, w, h } = localPoint(e);
-    if (placeMode) {
-      const hit = PLACEMENTS.filter((p) => p.side === side).find((p) => {
-        const r = resolvePlacement(p.id, garmentId);
-        if (!r) return false;
-        const dx = x - r.x * w;
-        const dy = y - r.y * h;
-        return Math.hypot(dx, dy) < 22;
-      });
-      if (hit) {
-        if (!artwork) return;
-        togglePlacement(hit.id);
-      }
-      return;
-    }
     const visible = [...useStudio.getState().layers]
       .filter((l) => l.side === side)
       .reverse();
@@ -115,7 +91,7 @@ export function StudioCanvas({
   }
 
   function onPointerMove(e: React.PointerEvent<HTMLCanvasElement>) {
-    if (!drag.current || placeMode) return;
+    if (!drag.current) return;
     const { x, y, w, h } = localPoint(e);
     updateLayer(drag.current.id, {
       x: Math.min(0.86, Math.max(0.14, (x - drag.current.ox) / w)),
@@ -128,7 +104,7 @@ export function StudioCanvas({
   }
 
   function onWheel(e: React.WheelEvent<HTMLCanvasElement>) {
-    if (placeMode || !selectedId) return;
+    if (!selectedId) return;
     e.preventDefault();
     const layer = layers.find((l) => l.id === selectedId);
     if (!layer) return;

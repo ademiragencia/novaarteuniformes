@@ -38,6 +38,51 @@ export function layerBox(layer: StudioLayer, w: number) {
   return { w: iw, h: ih };
 }
 
+function printImageOnFabric(
+  ctx: CanvasRenderingContext2D,
+  im: HTMLImageElement,
+  layer: ImageLayer,
+  canvasW: number,
+  canvasH: number,
+) {
+  const base = canvasW * 0.28 * layer.scale;
+  const iw = base;
+  const ih = iw * (im.naturalHeight / im.naturalWidth || 1);
+  const cx = layer.x * canvasW;
+  const cy = layer.y * canvasH;
+  const rad = (layer.rotation * Math.PI) / 180;
+  const pad = Math.ceil(Math.hypot(iw, ih) / 2) + 3;
+  const sx = Math.max(0, Math.floor(cx - pad));
+  const sy = Math.max(0, Math.floor(cy - pad));
+  const sw = Math.min(canvasW - sx, pad * 2);
+  const sh = Math.min(canvasH - sy, pad * 2);
+  if (sw < 2 || sh < 2) return;
+
+  const dest = ctx.getImageData(sx, sy, sw, sh);
+  const off = document.createElement("canvas");
+  off.width = sw;
+  off.height = sh;
+  const octx = off.getContext("2d");
+  if (!octx) return;
+  octx.translate(cx - sx, cy - sy);
+  octx.rotate(rad);
+  octx.drawImage(im, -iw / 2, -ih / 2, iw, ih);
+  const src = octx.getImageData(0, 0, sw, sh);
+  const dd = dest.data;
+  const sd = src.data;
+
+  for (let i = 0; i < sd.length; i += 4) {
+    const a = sd[i + 3] / 255;
+    if (a < 0.012) continue;
+    const lum = (0.2126 * dd[i] + 0.7152 * dd[i + 1] + 0.0722 * dd[i + 2]) / 255;
+    const shade = 0.56 + lum * 0.44;
+    dd[i] = dd[i] * (1 - a) + sd[i] * shade * a;
+    dd[i + 1] = dd[i + 1] * (1 - a) + sd[i + 1] * shade * a;
+    dd[i + 2] = dd[i + 2] * (1 - a) + sd[i + 2] * shade * a;
+  }
+  ctx.putImageData(dest, sx, sy);
+}
+
 export function drawLayer(
   ctx: CanvasRenderingContext2D,
   layer: StudioLayer,
@@ -45,40 +90,44 @@ export function drawLayer(
   h: number,
   selected: boolean,
 ) {
+  if (layer.type === "image") {
+    const im = imageCache.get(layer.src);
+    if (im) {
+      printImageOnFabric(ctx, im, layer, w, h);
+      if (selected) {
+        ctx.save();
+        ctx.translate(layer.x * w, layer.y * h);
+        ctx.rotate((layer.rotation * Math.PI) / 180);
+        const iw = w * 0.28 * layer.scale;
+        const ih = iw * (im.naturalHeight / im.naturalWidth || 1);
+        ctx.strokeStyle = "#1c3a2e";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 4]);
+        ctx.strokeRect(-iw / 2, -ih / 2, iw, ih);
+        ctx.restore();
+      }
+    }
+    return;
+  }
+
   ctx.save();
   ctx.translate(layer.x * w, layer.y * h);
   ctx.rotate((layer.rotation * Math.PI) / 180);
   ctx.scale(layer.scale, layer.scale);
-
-  if (layer.type === "text") {
-    const t = layer as TextLayer;
-    ctx.font = `700 ${Math.round(w * 0.055)}px "${t.font}", sans-serif`;
-    ctx.fillStyle = t.fill;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(t.text, 0, 0);
-    if (selected) {
-      const m = ctx.measureText(t.text);
-      const tw = m.width + 16;
-      const th = w * 0.07;
-      ctx.strokeStyle = "#1c3a2e";
-      ctx.lineWidth = 1.5 / layer.scale;
-      ctx.setLineDash([5 / layer.scale, 4 / layer.scale]);
-      ctx.strokeRect(-tw / 2, -th / 2, tw, th);
-    }
-  } else {
-    const im = imageCache.get((layer as ImageLayer).src);
-    if (im) {
-      const iw = w * 0.28;
-      const ih = iw * (im.naturalHeight / im.naturalWidth || 1);
-      ctx.drawImage(im, -iw / 2, -ih / 2, iw, ih);
-      if (selected) {
-        ctx.strokeStyle = "#1c3a2e";
-        ctx.lineWidth = 1.5 / layer.scale;
-        ctx.setLineDash([5 / layer.scale, 4 / layer.scale]);
-        ctx.strokeRect(-iw / 2, -ih / 2, iw, ih);
-      }
-    }
+  const t = layer as TextLayer;
+  ctx.font = `700 ${Math.round(w * 0.055)}px "${t.font}", sans-serif`;
+  ctx.fillStyle = t.fill;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(t.text, 0, 0);
+  if (selected) {
+    const m = ctx.measureText(t.text);
+    const tw = m.width + 16;
+    const th = w * 0.07;
+    ctx.strokeStyle = "#1c3a2e";
+    ctx.lineWidth = 1.5 / layer.scale;
+    ctx.setLineDash([5 / layer.scale, 4 / layer.scale]);
+    ctx.strokeRect(-tw / 2, -th / 2, tw, th);
   }
   ctx.restore();
 }
@@ -140,7 +189,7 @@ export async function renderGarmentSide(opts: {
       try {
         await loadImage(layer.src);
       } catch {
-        /* skip broken logo */
+        /* skip */
       }
     }
     drawLayer(ctx, layer, w, h, layer.id === opts.selectedId);

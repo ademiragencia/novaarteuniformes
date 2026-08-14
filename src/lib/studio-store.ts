@@ -14,8 +14,12 @@ import {
 } from "./studio";
 import type { TechniqueId } from "./products";
 
-export type Artwork = { src: string; name: string };
-export type StudioStep = 1 | 2 | 3;
+export type Artwork = {
+  src: string;
+  name: string;
+  removedBg?: boolean;
+  alreadyTransparent?: boolean;
+};
 
 type StudioState = {
   garmentId: string;
@@ -29,7 +33,7 @@ type StudioState = {
   notes: string;
   artwork: Artwork | null;
   placements: string[];
-  step: StudioStep;
+  previewOpen: boolean;
   setGarment: (id: string) => void;
   setColor: (hex: string) => void;
   setSide: (side: Side) => void;
@@ -45,7 +49,7 @@ type StudioState = {
   setArtwork: (art: Artwork) => void;
   clearArtwork: () => void;
   togglePlacement: (id: string) => void;
-  setStep: (step: StudioStep) => void;
+  setPreviewOpen: (open: boolean) => void;
   reset: () => void;
   loadFromProduct: (garmentId: string, color?: string) => void;
 };
@@ -89,7 +93,7 @@ const defaults = {
   notes: "",
   artwork: null as Artwork | null,
   placements: [] as string[],
-  step: 1 as StudioStep,
+  previewOpen: false,
 };
 
 export const useStudio = create<StudioState>()(
@@ -163,13 +167,13 @@ export const useStudio = create<StudioState>()(
       setCompany: (company) => set({ company }),
       setNotes: (notes) => set({ notes }),
       setArtwork: (art) => {
-        const placements = get().placements.length ? get().placements : ["chest-center"];
+        const placements = get().placements.length
+          ? get().placements
+          : [get().side === "back" ? "back-center" : "chest-center"];
         set({
           artwork: art,
           placements,
-          step: 2,
           layers: syncPlacementLayers(art, placements, get().garmentId, get().layers),
-          side: "front",
         });
       },
       clearArtwork: () =>
@@ -177,7 +181,6 @@ export const useStudio = create<StudioState>()(
           artwork: null,
           placements: [],
           layers: get().layers.filter((l) => l.type === "text" || !l.placementId),
-          step: 1,
         }),
       togglePlacement: (id) => {
         const on = get().placements.includes(id);
@@ -196,7 +199,7 @@ export const useStudio = create<StudioState>()(
           side: p?.side ?? get().side,
         });
       },
-      setStep: (step) => set({ step }),
+      setPreviewOpen: (previewOpen) => set({ previewOpen }),
       reset: () => set({ ...defaults, sizes: emptySizes(), layers: [], placements: [] }),
       loadFromProduct: (garmentId, color) =>
         set({
@@ -205,7 +208,7 @@ export const useStudio = create<StudioState>()(
         }),
     }),
     {
-      name: "nova-arte-studio-v2",
+      name: "nova-arte-studio-v3",
       skipHydration: true,
       partialize: (s) => ({
         garmentId: s.garmentId,
@@ -215,15 +218,10 @@ export const useStudio = create<StudioState>()(
         company: s.company,
         notes: s.notes,
         placements: s.placements,
-        step: s.step,
         artwork: s.artwork,
         layers: s.layers,
+        side: s.side,
       }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) return;
-        if (state.step !== 1 && state.step !== 2 && state.step !== 3) state.step = 1;
-        if (!Array.isArray(state.placements)) state.placements = [];
-      },
     },
   ),
 );
