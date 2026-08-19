@@ -1,4 +1,4 @@
-import { ImagePlus, Images, Trash2, Type, Upload } from "lucide-react";
+import { FileDown, ImagePlus, Images, Trash2, Type, Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,7 @@ import { useStudio } from "@/lib/studio-store";
 import { SITE, waLink } from "@/lib/site";
 import { formatBRL } from "@/lib/utils";
 import { saveQuote } from "@/lib/painel";
+import { buildQuotePdf, downloadBlob, shareQuotePdf } from "@/lib/quote-pdf";
 
 export function StudioPanel() {
   const garmentId = useStudio((s) => s.garmentId);
@@ -45,6 +46,7 @@ export function StudioPanel() {
   const [dragOver, setDragOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [keepBg, setKeepBg] = useState(false);
+  const [sending, setSending] = useState(false);
 
   async function applyFile(file: File | undefined) {
     if (!file) return;
@@ -68,13 +70,9 @@ export function StudioPanel() {
     }
   }
 
-  function sendQuote() {
-    if (qty < SITE.minPieces) {
-      toast.error(`Pedido mínimo de ${SITE.minPieces} peças.`);
-      return;
-    }
+  function quotePayload() {
     const colorName = GARMENT_COLORS.find((c) => c.hex === color)?.name ?? color;
-    const tech = TECHNIQUES.find((t) => t.id === technique)?.label;
+    const tech = TECHNIQUES.find((t) => t.id === technique)?.label ?? technique;
     const grade = SIZE_KEYS.filter((k) => sizes[k] > 0)
       .map((k) => `${k}: ${sizes[k]}`)
       .join(", ");
@@ -82,6 +80,34 @@ export function StudioPanel() {
       .map((id) => PLACEMENTS.find((p) => p.id === id)?.label)
       .filter(Boolean)
       .join(", ");
+    return { colorName, tech, grade, spots };
+  }
+
+  async function makePdf() {
+    const { colorName, tech, grade, spots } = quotePayload();
+    return buildQuotePdf({
+      garmentId,
+      garmentName: garment.name,
+      color,
+      colorName,
+      technique: tech,
+      placements: spots,
+      grade: `${grade} (total ${qty})`,
+      qty,
+      company,
+      notes,
+      estimate: formatBRL(estimate),
+      artworkName: artwork?.name,
+      layers,
+    });
+  }
+
+  async function sendQuote() {
+    if (qty < SITE.minPieces) {
+      toast.error(`Pedido mínimo de ${SITE.minPieces} peças.`);
+      return;
+    }
+    const { colorName, tech, grade, spots } = quotePayload();
     const text = [
       `Olá, Nova Arte! Quero orçamento pelo estúdio.`,
       `Peça: ${garment.name}`,
@@ -93,21 +119,50 @@ export function StudioPanel() {
       company ? `Empresa: ${company}` : "",
       notes ? `Obs: ${notes}` : "",
       `Estimativa no site: ${formatBRL(estimate)}`,
+      `Envio o PDF da visualização em anexo.`,
     ]
       .filter(Boolean)
       .join("\n");
-    void saveQuote({
-      data: {
-        name: company || "Estúdio",
-        company,
-        peca: garment.name,
-        color: colorName,
-        technique: tech,
-        qty,
-        notes: [spots, notes].filter(Boolean).join(" · "),
-      },
-    }).catch(() => undefined);
-    window.open(waLink(text), "_blank", "noopener,noreferrer");
+    setSending(true);
+    try {
+      const pdf = await makePdf();
+      const how = await shareQuotePdf(pdf.blob, pdf.filename, text);
+      void saveQuote({
+        data: {
+          name: company || "Estúdio",
+          company,
+          peca: garment.name,
+          color: colorName,
+          technique: tech,
+          qty,
+          notes: [spots, notes].filter(Boolean).join(" · "),
+        },
+      }).catch(() => undefined);
+      if (how === "downloaded") {
+        toast.success("PDF baixado. Anexe no WhatsApp que vai abrir.");
+        window.open(waLink(text), "_blank", "noopener,noreferrer");
+      } else {
+        toast.success("PDF pronto para enviar.");
+      }
+    } catch {
+      toast.error("Não deu para gerar o PDF, mas o WhatsApp vai abrir.");
+      window.open(waLink(text), "_blank", "noopener,noreferrer");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  async function downloadPdf() {
+    setSending(true);
+    try {
+      const pdf = await makePdf();
+      downloadBlob(pdf.blob, pdf.filename);
+      toast.success("PDF baixado.");
+    } catch {
+      toast.error("Não foi possível gerar o PDF.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -477,8 +532,17 @@ export function StudioPanel() {
         >
           <Images /> Gerar visualização da peça
         </Button>
-        <Button className="mt-2 w-full" size="lg" onClick={sendQuote}>
-          Pedir orçamento no WhatsApp
+        <Button
+          className="mt-2 w-full"
+          size="lg"
+          variant="secondary"
+          disabled={sending}
+          onClick={() => void downloadPdf()}
+        >
+          <FileDown /> {sending ? "Gerando PDF…" : "Baixar PDF do pedido"}
+        </Button>
+        <Button className="mt-2 w-full" size="lg" disabled={sending} onClick={() => void sendQuote()}>
+          {sending ? "Preparando…" : "Pedir orçamento no WhatsApp"}
         </Button>
       </div>
     </div>

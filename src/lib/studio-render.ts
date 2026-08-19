@@ -229,7 +229,8 @@ export async function renderGarmentSide(opts: {
 
 export async function sideToDataUrl(
   opts: Parameters<typeof renderGarmentSide>[0],
+  type: "image/png" | "image/jpeg" = "image/png",
 ) {
   const canvas = await renderGarmentSide(opts);
-  return canvas.toDataURL("image/png");
+  return canvas.toDataURL(type, 0.9);
 }

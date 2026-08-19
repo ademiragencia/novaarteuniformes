@@ -1,9 +1,13 @@
-import { Download, X } from "lucide-react";
+import { Download, FileDown, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { GARMENT_COLORS, PLACEMENTS, getGarment } from "@/lib/studio";
+import { GARMENT_COLORS, PLACEMENTS, SIZE_KEYS, TECHNIQUES, estimateTotal, getGarment, totalPieces } from "@/lib/studio";
 import { sideToDataUrl } from "@/lib/studio-render";
 import { useStudio } from "@/lib/studio-store";
+import { buildQuotePdf, downloadBlob } from "@/lib/quote-pdf";
+import { SITE, waLink } from "@/lib/site";
+import { formatBRL } from "@/lib/utils";
 
 export function StudioPreview() {
   const open = useStudio((s) => s.previewOpen);
@@ -11,8 +15,14 @@ export function StudioPreview() {
   const color = useStudio((s) => s.color);
   const layers = useStudio((s) => s.layers);
   const placements = useStudio((s) => s.placements);
+  const technique = useStudio((s) => s.technique);
+  const sizes = useStudio((s) => s.sizes);
+  const company = useStudio((s) => s.company);
+  const notes = useStudio((s) => s.notes);
+  const artwork = useStudio((s) => s.artwork);
   const [front, setFront] = useState<string | null>(null);
   const [back, setBack] = useState<string | null>(null);
+  const [pdfBusy, setPdfBusy] = useState(false);
   const garment = getGarment(garmentId);
   const colorName = GARMENT_COLORS.find((c) => c.hex === color)?.name ?? color;
   const spots = placements
@@ -54,6 +64,40 @@ export function StudioPreview() {
     a.href = src;
     a.download = name;
     a.click();
+  }
+
+  async function downloadPdf() {
+    setPdfBusy(true);
+    try {
+      const tech = TECHNIQUES.find((t) => t.id === technique)?.label ?? technique;
+      const qty = totalPieces(sizes);
+      const grade = SIZE_KEYS.filter((k) => sizes[k] > 0)
+        .map((k) => `${k}: ${sizes[k]}`)
+        .join(", ");
+      const pdf = await buildQuotePdf({
+        garmentId,
+        garmentName: garment.name,
+        color,
+        colorName,
+        technique: tech,
+        placements: spots,
+        grade: `${grade} (total ${qty})`,
+        qty,
+        company,
+        notes,
+        estimate: formatBRL(estimateTotal(garment.priceFrom, Math.max(qty, SITE.minPieces), technique)),
+        artworkName: artwork?.name,
+        layers,
+        front,
+        back,
+      });
+      downloadBlob(pdf.blob, pdf.filename);
+      toast.success("PDF baixado. Pode anexar no WhatsApp.");
+    } catch {
+      toast.error("Não foi possível gerar o PDF.");
+    } finally {
+      setPdfBusy(false);
+    }
   }
 
   if (!open) return null;
@@ -116,17 +160,38 @@ export function StudioPreview() {
         <div className="flex flex-wrap gap-2 border-t border-line px-5 py-4">
           <Button
             variant="secondary"
+            disabled={!front || pdfBusy}
+            onClick={() => void downloadPdf()}
+          >
+            <FileDown /> {pdfBusy ? "Gerando PDF…" : "Baixar PDF"}
+          </Button>
+          <Button
+            disabled={!front || pdfBusy}
+            onClick={() => {
+              void downloadPdf().then(() => {
+                window.open(
+                  waLink("Olá, Nova Arte! Segue o PDF da visualização da peça para orçamento."),
+                  "_blank",
+                  "noopener,noreferrer",
+                );
+              });
+            }}
+          >
+            Enviar no WhatsApp
+          </Button>
+          <Button
+            variant="secondary"
             disabled={!front}
             onClick={() => front && save(front, `nova-arte-${garment.id}-frente.png`)}
           >
-            <Download /> Baixar frente
+            <Download /> Frente
           </Button>
           <Button
             variant="secondary"
             disabled={!back}
             onClick={() => back && save(back, `nova-arte-${garment.id}-costas.png`)}
           >
-            <Download /> Baixar costas
+            <Download /> Costas
           </Button>
           <Button variant="ghost" onClick={() => useStudio.getState().setPreviewOpen(false)}>
             Voltar ao estúdio
