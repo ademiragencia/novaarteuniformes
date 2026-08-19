@@ -1,28 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Menu } from "lucide-react";
 import { useState } from "react";
-import { UserButton } from "@/lib/auth/gates";
-import { useCurrentUserState } from "@/lib/auth/use-current-user";
 import { NAV, SITE } from "@/lib/site";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "./logo";
-
-function AuthSlot() {
-  const { user, isPending } = useCurrentUserState();
-  if (isPending) {
-    return <div className="size-8 animate-pulse rounded-full bg-paper-deep" />;
-  }
-  if (user) return <UserButton />;
-  return (
-    <Link
-      to="/login"
-      className="hidden text-sm text-ink-soft hover:text-ink md:inline"
-    >
-      Entrar
-    </Link>
-  );
-}
 
 export function Header() {
   const [open, setOpen] = useState(false);
@@ -55,7 +37,6 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <AuthSlot />
           <Button asChild size="sm" className="hidden sm:inline-flex">
             <Link to="/estudio">Personalizar</Link>
           </Button>

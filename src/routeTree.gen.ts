@@ -15,6 +15,7 @@ import { Route as ContatoRouteImport } from './routes/contato'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EstudioRouteImport } from './routes/estudio'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as PainelRouteImport } from './routes/painel'
 import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as SobreRouteImport } from './routes/sobre'
@@ -52,6 +53,11 @@ const EstudioRoute = EstudioRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacidadeRoute = PrivacidadeRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRoute
   '/estudio': typeof EstudioRoute
   '/login': typeof LoginRoute
+  '/painel': typeof PainelRoute
   '/privacidade': typeof PrivacidadeRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRoute
   '/estudio': typeof EstudioRoute
   '/login': typeof LoginRoute
+  '/painel': typeof PainelRoute
   '/privacidade': typeof PrivacidadeRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRoute
   '/estudio': typeof EstudioRoute
   '/login': typeof LoginRoute
+  '/painel': typeof PainelRoute
   '/privacidade': typeof PrivacidadeRoute
   '/produtos': typeof ProdutosRouteWithChildren
   '/sobre': typeof SobreRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/estudio'
     | '/login'
+    | '/painel'
     | '/privacidade'
     | '/produtos'
     | '/sobre'
@@ -169,6 +179,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/estudio'
     | '/login'
+    | '/painel'
     | '/privacidade'
     | '/produtos'
     | '/sobre'
@@ -185,6 +196,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/estudio'
     | '/login'
+    | '/painel'
     | '/privacidade'
     | '/produtos'
     | '/sobre'
@@ -202,6 +214,7 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRoute
   EstudioRoute: typeof EstudioRoute
   LoginRoute: typeof LoginRoute
+  PainelRoute: typeof PainelRoute
   PrivacidadeRoute: typeof PrivacidadeRoute
   ProdutosRoute: typeof ProdutosRouteWithChildren
   SobreRoute: typeof SobreRoute
@@ -253,6 +266,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacidade': {
@@ -333,6 +353,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRoute,
   EstudioRoute: EstudioRoute,
   LoginRoute: LoginRoute,
+  PainelRoute: PainelRoute,
   PrivacidadeRoute: PrivacidadeRoute,
   ProdutosRoute: ProdutosRouteWithChildren,
   SobreRoute: SobreRoute,

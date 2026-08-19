@@ -23,6 +23,7 @@ import { prepareArtwork, readImageFile } from "@/lib/remove-bg";
 import { useStudio } from "@/lib/studio-store";
 import { SITE, waLink } from "@/lib/site";
 import { formatBRL } from "@/lib/utils";
+import { saveQuote } from "@/lib/painel";
 
 export function StudioPanel() {
   const garmentId = useStudio((s) => s.garmentId);
@@ -95,6 +96,17 @@ export function StudioPanel() {
     ]
       .filter(Boolean)
       .join("\n");
+    void saveQuote({
+      data: {
+        name: company || "Estúdio",
+        company,
+        peca: garment.name,
+        color: colorName,
+        technique: tech,
+        qty,
+        notes: [spots, notes].filter(Boolean).join(" · "),
+      },
+    }).catch(() => undefined);
     window.open(waLink(text), "_blank", "noopener,noreferrer");
   }
 

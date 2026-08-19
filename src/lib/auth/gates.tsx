@@ -14,7 +14,7 @@ import { useCurrentUser, useCurrentUserState } from "./use-current-user";
  */
 
 /** Where `RedirectToSignIn` sends signed-out visitors. Create this route. */
-export const SIGN_IN_PATH = "/login";
+export const SIGN_IN_PATH = "/painel";
 
 /** Render children only when a user is present (real session, or the disabled-auth dev user). */
 export function SignedIn({ children }: { children: ReactNode }) {

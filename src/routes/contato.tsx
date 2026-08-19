@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { SITE, waLink } from "@/lib/site";
+import { saveQuote } from "@/lib/painel";
 
 export const Route = createFileRoute("/contato")({ component: Contato });
 
@@ -23,6 +24,13 @@ function Contato() {
       .filter(Boolean)
       .join("\n");
     window.open(waLink(text), "_blank", "noopener,noreferrer");
+    void saveQuote({
+      data: {
+        name: form.name,
+        phone: form.phone,
+        notes: form.message,
+      },
+    }).catch(() => undefined);
   }
 
   return (
