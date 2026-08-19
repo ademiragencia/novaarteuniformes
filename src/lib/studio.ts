@@ -159,17 +159,29 @@ export function resolvePlacement(id: string, garmentId: string) {
 }
 
 export const GARMENT_COLORS = [
-  { name: "Branco", hex: "#F4F1EA" },
-  { name: "Preto", hex: "#1A1A1A" },
-  { name: "Marinho", hex: "#1B2A4A" },
-  { name: "Verde floresta", hex: "#0F613A" },
-  { name: "Musgo", hex: "#4A5C3A" },
-  { name: "Vinho", hex: "#6B2B32" },
-  { name: "Cinza", hex: "#6E6A64" },
-  { name: "Vermelho", hex: "#8B1E1E" },
-  { name: "Royal", hex: "#1E3A8A" },
-  { name: "Areia", hex: "#C4B49A" },
+  { name: "Branco", hex: "#F4F1EA", slug: "white" },
+  { name: "Preto", hex: "#1A1A1A", slug: "black" },
+  { name: "Marinho", hex: "#1B2A4A", slug: "navy" },
+  { name: "Verde floresta", hex: "#0F613A", slug: "forest" },
+  { name: "Musgo", hex: "#4A5C3A", slug: "moss" },
+  { name: "Vinho", hex: "#6B2B32", slug: "wine" },
+  { name: "Cinza", hex: "#6E6A64", slug: "gray" },
+  { name: "Vermelho", hex: "#8B1E1E", slug: "red" },
+  { name: "Royal", hex: "#1E3A8A", slug: "royal" },
+  { name: "Areia", hex: "#C4B49A", slug: "sand" },
 ] as const;
+
+export function colorSlug(hex: string) {
+  return GARMENT_COLORS.find((c) => c.hex.toLowerCase() === hex.toLowerCase())?.slug ?? "white";
+}
+
+export function garmentSrc(garmentId: string, side: Side, hex: string) {
+  const garment = getGarment(garmentId);
+  const slug = colorSlug(hex);
+  if (slug === "white") return side === "front" ? garment.front : garment.back;
+  return `/mockups/${garmentId}-${side}-${slug}.jpg?v=5`;
+}
+
 
 export const STUDIO_FONTS = [
   { id: "Oswald", label: "Oswald" },

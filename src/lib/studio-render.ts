@@ -4,6 +4,8 @@ import {
   type StudioLayer,
   type TextLayer,
   PLACEMENTS,
+  colorSlug,
+  garmentSrc,
   getGarment,
   resolvePlacement,
   tintWhiteGarment,
@@ -160,8 +162,17 @@ export async function renderGarmentSide(opts: {
   activePlacements?: string[];
 }): Promise<HTMLCanvasElement> {
   const garment = getGarment(opts.garmentId);
-  const src = opts.side === "front" ? garment.front : garment.back;
-  const img = await loadImage(src);
+  const preferred = garmentSrc(opts.garmentId, opts.side, opts.color);
+  const fallback = opts.side === "front" ? garment.front : garment.back;
+  let img: HTMLImageElement;
+  let needsTint = false;
+  try {
+    img = await loadImage(preferred);
+    needsTint = colorSlug(opts.color) !== "white" && preferred === fallback;
+  } catch {
+    img = await loadImage(fallback);
+    needsTint = colorSlug(opts.color) !== "white";
+  }
   const w = opts.width ?? 720;
   const h = Math.round(w * (img.naturalHeight / img.naturalWidth));
   const canvas = document.createElement("canvas");
@@ -170,8 +181,11 @@ export async function renderGarmentSide(opts: {
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
 
-  const tinted = tintWhiteGarment(img, w, h, opts.color, src);
-  ctx.drawImage(tinted, 0, 0, w, h);
+  if (needsTint) {
+    ctx.drawImage(tintWhiteGarment(img, w, h, opts.color, fallback), 0, 0, w, h);
+  } else {
+    ctx.drawImage(img, 0, 0, w, h);
+  }
 
   if (opts.showGuides) {
     const print = opts.side === "front" ? garment.print : garment.printBack;
