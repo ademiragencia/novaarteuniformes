@@ -50,8 +50,8 @@ export const GARMENTS: Garment[] = [
     id: "tshirt",
     name: "Camiseta",
     priceFrom: 32.9,
-    front: "/mockups/tshirt-front.png?v=3",
-    back: "/mockups/tshirt-back.png?v=3",
+    front: "/mockups/tshirt-front.jpg?v=4",
+    back: "/mockups/tshirt-back.jpg?v=4",
     print: { x: 0.3, y: 0.3, w: 0.4, h: 0.32 },
     printBack: { x: 0.28, y: 0.26, w: 0.44, h: 0.38 },
   },
@@ -59,8 +59,8 @@ export const GARMENTS: Garment[] = [
     id: "polo",
     name: "Polo",
     priceFrom: 54.9,
-    front: "/mockups/polo-front.png?v=3",
-    back: "/mockups/polo-back.png?v=3",
+    front: "/mockups/polo-front.jpg?v=4",
+    back: "/mockups/polo-back.jpg?v=4",
     print: { x: 0.32, y: 0.28, w: 0.36, h: 0.28 },
     printBack: { x: 0.28, y: 0.24, w: 0.44, h: 0.38 },
   },
@@ -68,8 +68,8 @@ export const GARMENTS: Garment[] = [
     id: "hoodie",
     name: "Moletom",
     priceFrom: 129.9,
-    front: "/mockups/hoodie-front.png?v=3",
-    back: "/mockups/hoodie-back.png?v=3",
+    front: "/mockups/hoodie-front.jpg?v=4",
+    back: "/mockups/hoodie-back.jpg?v=4",
     print: { x: 0.32, y: 0.26, w: 0.36, h: 0.22 },
     printBack: { x: 0.28, y: 0.22, w: 0.44, h: 0.36 },
   },
@@ -234,29 +234,7 @@ export const STUDIO_BACKDROP = "#E5EAF0";
 
 const tintCache = new Map<string, HTMLCanvasElement>();
 
-function smoothLuma(luma: Uint8Array, w: number, h: number) {
-  const out = new Uint8Array(luma.length);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      let s = 0;
-      let c = 0;
-      for (let dy = -1; dy <= 1; dy++) {
-        const ny = y + dy;
-        if (ny < 0 || ny >= h) continue;
-        for (let dx = -1; dx <= 1; dx++) {
-          const nx = x + dx;
-          if (nx < 0 || nx >= w) continue;
-          s += luma[ny * w + nx];
-          c++;
-        }
-      }
-      out[y * w + x] = (s / c + 0.5) | 0;
-    }
-  }
-  return out;
-}
-
-/** Dye only the garment (alpha or isolated fabric). Backdrop stays clean. */
+/** Recolor fabric by growing from the bright shirt, never punching holes. */
 export function tintWhiteGarment(
   source: CanvasImageSource,
   width: number,
@@ -273,74 +251,93 @@ export function tintWhiteGarment(
   canvas.height = height;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) return canvas;
-  ctx.clearRect(0, 0, width, height);
   ctx.drawImage(source, 0, 0, width, height);
 
   const { r: tr, g: tg, b: tb } = hexToRgb(hex);
-  const skipDye = tr > 230 && tg > 225 && tb > 215;
+  if (tr > 230 && tg > 225 && tb > 215) {
+    tintCache.set(key, canvas);
+    return canvas;
+  }
 
   const image = ctx.getImageData(0, 0, width, height);
   const d = image.data;
   const n = width * height;
   const luma = new Uint8Array(n);
-  let opaque = 0;
-  for (let p = 0, i = 0; p < n; p++, i += 4) {
-    luma[p] = (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2] + 0.5) | 0;
-    if (d[i + 3] > 12) opaque++;
-  }
-
-  const hasAlpha = opaque < n * 0.92;
-  if (!hasAlpha) {
-    const cut = 222;
-    const bg = new Uint8Array(n);
-    const qx = new Int32Array(n);
-    const qy = new Int32Array(n);
-    let head = 0;
-    let tail = 0;
-    const enqueue = (x: number, y: number) => {
-      const p = y * width + x;
-      if (bg[p] || luma[p] >= cut) return;
-      bg[p] = 1;
-      qx[tail] = x;
-      qy[tail] = y;
-      tail++;
-    };
+  let bR = 0;
+  let bG = 0;
+  let bB = 0;
+  let bN = 0;
+  const edge = 6;
+  for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
-      enqueue(x, 0);
-      enqueue(x, height - 1);
+      const p = y * width + x;
+      const i = p * 4;
+      luma[p] = (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2] + 0.5) | 0;
+      if (x < edge || y < edge || x >= width - edge || y >= height - edge) {
+        bR += d[i];
+        bG += d[i + 1];
+        bB += d[i + 2];
+        bN++;
+      }
     }
-    for (let y = 0; y < height; y++) {
-      enqueue(0, y);
-      enqueue(width - 1, y);
-    }
-    while (head < tail) {
-      const x = qx[head];
-      const y = qy[head];
-      head++;
-      if (x > 0) enqueue(x - 1, y);
-      if (x + 1 < width) enqueue(x + 1, y);
-      if (y > 0) enqueue(x, y - 1);
-      if (y + 1 < height) enqueue(x, y + 1);
-    }
-    for (let p = 0, i = 0; p < n; p++, i += 4) {
-      d[i + 3] = bg[p] ? 0 : 255;
+  }
+  const bgR = bR / bN;
+  const bgG = bG / bN;
+  const bgB = bB / bN;
+  const bgL = 0.2126 * bgR + 0.7152 * bgG + 0.0722 * bgB;
+
+  const shirt = new Uint8Array(n);
+  const qx = new Int32Array(n);
+  const qy = new Int32Array(n);
+  let head = 0;
+  let tail = 0;
+  const padX = Math.round(width * 0.05);
+  const padY = Math.round(height * 0.05);
+  const enqueue = (x: number, y: number) => {
+    const p = y * width + x;
+    if (shirt[p]) return;
+    shirt[p] = 1;
+    qx[tail] = x;
+    qy[tail] = y;
+    tail++;
+  };
+
+  for (let y = padY; y < height - padY; y++) {
+    for (let x = padX; x < width - padX; x++) {
+      const p = y * width + x;
+      const i = p * 4;
+      const dist = Math.hypot(d[i] - bgR, d[i + 1] - bgG, d[i + 2] - bgB);
+      if (luma[p] >= bgL + 12 && dist > 14) enqueue(x, y);
     }
   }
 
-  if (!skipDye) {
-    const soft = smoothLuma(luma, width, height);
-    for (let p = 0, i = 0; p < n; p++, i += 4) {
-      const a = d[i + 3] / 255;
-      if (a < 0.02) continue;
-      const sample = a < 0.92 ? 244 : soft[p];
-      const nrm = Math.min(1, sample / 246);
-      const shade = 0.1 + 0.9 * nrm;
-      d[i] = tr * shade;
-      d[i + 1] = tg * shade;
-      d[i + 2] = tb * shade;
+  while (head < tail) {
+    const x = qx[head];
+    const y = qy[head];
+    head++;
+    for (const [nx, ny] of [
+      [x - 1, y],
+      [x + 1, y],
+      [x, y - 1],
+      [x, y + 1],
+    ] as const) {
+      if (nx < 1 || ny < 1 || nx >= width - 1 || ny >= height - 1) continue;
+      const p = ny * width + nx;
+      if (shirt[p]) continue;
+      const i = p * 4;
+      const dist = Math.hypot(d[i] - bgR, d[i + 1] - bgG, d[i + 2] - bgB);
+      if (luma[p] >= bgL + 6 || dist > 11) enqueue(nx, ny);
     }
   }
 
+  for (let p = 0, i = 0; p < n; p++, i += 4) {
+    if (!shirt[p]) continue;
+    const nrm = Math.min(1, luma[p] / 246);
+    const shade = 0.12 + 0.88 * nrm;
+    d[i] = tr * shade;
+    d[i + 1] = tg * shade;
+    d[i + 2] = tb * shade;
+  }
   ctx.putImageData(image, 0, 0);
   if (tintCache.size > 40) tintCache.clear();
   tintCache.set(key, canvas);

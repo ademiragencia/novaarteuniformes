@@ -4,7 +4,6 @@ import {
   type StudioLayer,
   type TextLayer,
   PLACEMENTS,
-  STUDIO_BACKDROP,
   getGarment,
   resolvePlacement,
   tintWhiteGarment,
@@ -172,8 +171,6 @@ export async function renderGarmentSide(opts: {
   if (!ctx) return canvas;
 
   const tinted = tintWhiteGarment(img, w, h, opts.color, src);
-  ctx.fillStyle = STUDIO_BACKDROP;
-  ctx.fillRect(0, 0, w, h);
   ctx.drawImage(tinted, 0, 0, w, h);
 
   if (opts.showGuides) {

@@ -47,8 +47,8 @@ export const PRODUCTS: Product[] = [
     blurb: "A peça de trabalho do dia a dia. Malha firme, caimento reto.",
     description:
       "Camiseta 100% algodão 30.1, gola careca reforçada e costura ombro a ombro. A base mais pedida para silk e DTF. Indicada para equipes, eventos e merchandising. Pedido mínimo de 10 peças.",
-    image: "/mockups/tshirt-front.png",
-    gallery: ["/mockups/tshirt-front.png", "/mockups/tshirt-back.png", "/images/tshirt-navy.jpg"],
+    image: "/mockups/tshirt-front.jpg",
+    gallery: ["/mockups/tshirt-front.jpg", "/mockups/tshirt-back.jpg", "/images/tshirt-navy.jpg"],
     colors: [
       { name: "Branco", hex: "#F4F1EA" },
       { name: "Preto", hex: "#1A1A1A" },
@@ -71,7 +71,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Mesma construção da Cotton 30.1, tingida em marinho fechado. Recebe bordado no peito e DTF nas costas com excelente contraste.",
     image: "/images/tshirt-navy.jpg",
-    gallery: ["/images/tshirt-navy.jpg", "/mockups/tshirt-front.png"],
+    gallery: ["/images/tshirt-navy.jpg", "/mockups/tshirt-front.jpg"],
     colors: [
       { name: "Marinho", hex: "#1B2A4A" },
       { name: "Preto", hex: "#1A1A1A" },
@@ -92,8 +92,8 @@ export const PRODUCTS: Product[] = [
     blurb: "Gola e punho em ribana. A polo que veste a recepção e o chão de fábrica.",
     description:
       "Polo em piquet penteado, botões em tom, gola estruturada. Aceita bordado no peito com acabamento de casa de uniformes. A peça mais pedida para identidade corporativa.",
-    image: "/mockups/polo-front.png",
-    gallery: ["/mockups/polo-front.png", "/mockups/polo-back.png", "/images/polos-stack.jpg"],
+    image: "/mockups/polo-front.jpg",
+    gallery: ["/mockups/polo-front.jpg", "/mockups/polo-back.jpg", "/images/polos-stack.jpg"],
     colors: [
       { name: "Branco", hex: "#F4F1EA" },
       { name: "Preto", hex: "#1A1A1A" },
@@ -117,7 +117,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Modelagem raglan com manga e gola em cor contrastante. Ideal para times comerciais que querem um uniforme menos óbvio. Silk ou bordado no peito.",
     image: "/images/polo-raglan.jpg",
-    gallery: ["/images/polo-raglan.jpg", "/mockups/polo-front.png"],
+    gallery: ["/images/polo-raglan.jpg", "/mockups/polo-front.jpg"],
     colors: [
       { name: "Mescla / marinho", hex: "#8A8F96" },
       { name: "Branco / preto", hex: "#F4F1EA" },
@@ -137,8 +137,8 @@ export const PRODUCTS: Product[] = [
     blurb: "Flanelado interno, capuz e bolso. O moletom da equipe no inverno.",
     description:
       "Moletom 50/50 com felpa interna, capuz forrado e cordão. Recebe silk, DTF e bordado no peito acima do bolso. Pedido mínimo de 10 peças, cores sob consulta.",
-    image: "/mockups/hoodie-front.png",
-    gallery: ["/mockups/hoodie-front.png", "/mockups/hoodie-back.png", "/images/hoodie-burgundy.jpg"],
+    image: "/mockups/hoodie-front.jpg",
+    gallery: ["/mockups/hoodie-front.jpg", "/mockups/hoodie-back.jpg", "/images/hoodie-burgundy.jpg"],
     colors: [
       { name: "Branco", hex: "#F4F1EA" },
       { name: "Preto", hex: "#1A1A1A" },
@@ -162,7 +162,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Mesma construção do canguru, no vinho que aparece em toda a nossa produção. Combina com bordado tom sobre tom ou DTF claro.",
     image: "/images/hoodie-burgundy.jpg",
-    gallery: ["/images/hoodie-burgundy.jpg", "/mockups/hoodie-front.png"],
+    gallery: ["/images/hoodie-burgundy.jpg", "/mockups/hoodie-front.jpg"],
     colors: [
       { name: "Vinho", hex: "#6B2B32" },
       { name: "Preto", hex: "#1A1A1A" },
@@ -227,7 +227,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Jaqueta estilo college em moletom, botões de pressão e punhos listrados. Bordado no peito e nas costas. Pedido mínimo de 10 peças.",
     image: "/images/varsity.jpg",
-    gallery: ["/images/varsity.jpg", "/mockups/hoodie-front.png"],
+    gallery: ["/images/varsity.jpg", "/mockups/hoodie-front.jpg"],
     colors: [{ name: "Creme / preto", hex: "#E7DFD0" }],
     sizes: ["P", "M", "G", "GG", "XG"],
     techniques: ["bordado", "dtf"],
@@ -289,7 +289,7 @@ export const PRODUCTS: Product[] = [
     description:
       "Regata 100% algodão, cava confortável e gola reforçada. Boa base para silk e DTF. Pedido mínimo de 10 peças.",
     image: "/images/tank.jpg",
-    gallery: ["/images/tank.jpg", "/mockups/tshirt-front.png"],
+    gallery: ["/images/tank.jpg", "/mockups/tshirt-front.jpg"],
     colors: [
       { name: "Creme", hex: "#F4F1EA" },
       { name: "Preto", hex: "#1A1A1A" },
