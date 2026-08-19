@@ -170,7 +170,7 @@ export async function renderGarmentSide(opts: {
   const ctx = canvas.getContext("2d");
   if (!ctx) return canvas;
 
-  const tinted = tintWhiteGarment(img, w, h, opts.color);
+  const tinted = tintWhiteGarment(img, w, h, opts.color, src);
   ctx.drawImage(tinted, 0, 0, w, h);
 
   if (opts.showGuides) {
