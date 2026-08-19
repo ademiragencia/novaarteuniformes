@@ -1,7 +1,10 @@
 import { useEffect, useRef } from "react";
+import { Trash2 } from "lucide-react";
 import { getGarment } from "@/lib/studio";
 import { hitTest, loadImage, renderGarmentSide } from "@/lib/studio-render";
 import { useStudio } from "@/lib/studio-store";
+import type { TextLayer } from "@/lib/studio";
+import { Button } from "@/components/ui/button";
 
 export function StudioCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,6 +17,7 @@ export function StudioCanvas() {
   const select = useStudio((s) => s.select);
   const updateLayer = useStudio((s) => s.updateLayer);
   const drag = useRef<{ id: string; ox: number; oy: number } | null>(null);
+  const selected = layers.find((l) => l.id === selectedId);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,6 +66,22 @@ export function StudioCanvas() {
       ro.disconnect();
     };
   }, [garmentId, color, side, layers, selectedId]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Delete" && e.key !== "Backspace") return;
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable)) {
+        return;
+      }
+      const id = useStudio.getState().selectedId;
+      if (!id) return;
+      e.preventDefault();
+      useStudio.getState().removeLayer(id);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   function localPoint(e: React.PointerEvent<HTMLCanvasElement>) {
     const canvas = canvasRef.current;
@@ -113,16 +133,34 @@ export function StudioCanvas() {
   }
 
   return (
-    <div ref={wrapRef} className="relative flex min-h-[320px] items-center justify-center">
-      <canvas
-        ref={canvasRef}
-        className="max-w-full touch-none rounded-lg"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-        onWheel={onWheel}
-      />
+    <div className="flex flex-col gap-3">
+      <div ref={wrapRef} className="relative flex min-h-[320px] items-center justify-center">
+        <canvas
+          ref={canvasRef}
+          className="max-w-full touch-none rounded-lg"
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          onWheel={onWheel}
+        />
+      </div>
+      {selected && selected.side === side && (
+        <div className="flex items-center justify-between gap-3 rounded-md border border-line bg-paper px-3 py-2">
+          <p className="min-w-0 truncate text-sm">
+            {selected.type === "text"
+              ? `Texto: ${(selected as TextLayer).text || "(vazio)"}`
+              : "Arte na peça"}
+          </p>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => useStudio.getState().removeLayer(selected.id)}
+          >
+            <Trash2 /> Apagar
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

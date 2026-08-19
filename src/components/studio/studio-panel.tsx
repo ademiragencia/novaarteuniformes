@@ -301,6 +301,46 @@ export function StudioPanel() {
             <ImagePlus /> Imagem
           </Button>
         </div>
+        {layers.filter((l) => l.type === "text").length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            {layers
+              .filter((l) => l.type === "text")
+              .map((layer) => {
+                const t = layer as TextLayer;
+                const on = selectedId === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${
+                      on ? "border-forest bg-paper-deep" : "border-line bg-canvas"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="min-w-0 flex-1 truncate text-left text-sm"
+                      onClick={() => {
+                        useStudio.getState().setSide(t.side);
+                        useStudio.getState().select(t.id);
+                      }}
+                    >
+                      {t.text || "(texto vazio)"}
+                      <span className="ml-1 text-[0.7rem] text-muted">
+                        · {t.side === "back" ? "costas" : "frente"}
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-danger hover:bg-paper"
+                      onClick={() => useStudio.getState().removeLayer(t.id)}
+                      aria-label={`Apagar texto ${t.text}`}
+                    >
+                      <Trash2 className="size-3.5" /> Apagar
+                    </button>
+                  </div>
+                );
+              })}
+          </div>
+        )}
         {artwork && (
           <div className="flex items-center gap-3 rounded-md border border-line bg-canvas p-2">
             <img
@@ -371,14 +411,13 @@ export function StudioPanel() {
         <section className="rounded-lg border border-line bg-canvas p-4">
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">Texto selecionado</p>
-            <button
-              type="button"
-              className="text-muted hover:text-danger"
+            <Button
+              size="sm"
+              variant="secondary"
               onClick={() => useStudio.getState().removeLayer(selected.id)}
-              aria-label="Remover"
             >
-              <Trash2 className="size-4" />
-            </button>
+              <Trash2 /> Apagar texto
+            </Button>
           </div>
           <Input
             className="mt-3"
