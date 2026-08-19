@@ -4,7 +4,7 @@ export function WhatsappFab() {
   return (
     <a
       href={`https://wa.me/${SITE.phoneE164}?text=${encodeURIComponent("Olá, quero um orçamento de uniformes.")}`}
-      className="fixed right-4 bottom-4 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-forest px-4 text-sm font-medium text-cream shadow-lg shadow-ink/15 hover:bg-forest-soft sm:right-6 sm:bottom-6"
+      className="fixed right-4 bottom-4 z-40 inline-flex h-12 items-center gap-2 rounded-full bg-moss px-4 text-sm font-medium text-canvas shadow-lg shadow-ink/15 hover:bg-moss/90 sm:right-6 sm:bottom-6"
       aria-label="Falar no WhatsApp"
     >
       <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden>

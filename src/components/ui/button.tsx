@@ -12,7 +12,7 @@ const buttonVariants = cva(
         secondary: "bg-canvas text-ink border border-line hover:bg-paper-deep",
         outline: "border border-line-strong bg-transparent text-ink hover:bg-paper-deep",
         ghost: "text-ink hover:bg-paper-deep",
-        cream: "bg-cream text-forest-deep hover:bg-canvas",
+        cream: "bg-canvas text-forest hover:bg-paper-deep",
         inverse: "bg-ink text-cream hover:bg-ink-soft",
         link: "text-forest underline-offset-4 hover:underline px-0",
       },

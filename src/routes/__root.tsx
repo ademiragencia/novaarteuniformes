@@ -24,7 +24,7 @@ export const Route = createRootRoute({
           "Silk, DTF, bordado e sublimação. Personalize a camiseta da sua equipe e peça orçamento. Pedido mínimo de 10 peças, entrega para todo o Brasil.",
       },
       { name: "apple-mobile-web-app-title", content: APP_NAME },
-      { name: "theme-color", content: "#1C3A2E" },
+      { name: "theme-color", content: "#102551" },
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:type", content: "website" },
       { property: "og:image", content: ogImage },
@@ -33,6 +33,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", type: "image/png", href: "/brand/favicon.png" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
@@ -65,9 +66,9 @@ export const Route = createRootRoute({
           position="top-center"
           toastOptions={{
             style: {
-              background: "#fffcf7",
-              color: "#171411",
-              border: "1px solid #ddd5c8",
+              background: "#ffffff",
+              color: "#0c1733",
+              border: "1px solid #d5dbe4",
             },
           }}
         />

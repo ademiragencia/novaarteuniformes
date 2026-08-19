@@ -2,30 +2,31 @@
 
 @theme {
   --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Newsreader", ui-serif, Georgia, "Times New Roman", serif;
+  --font-display: "Oswald", ui-sans-serif, system-ui, sans-serif;
 
-  --color-paper: #f3eee6;
-  --color-paper-deep: #e8e0d2;
-  --color-canvas: #fffcf7;
-  --color-ink: #171411;
-  --color-ink-soft: #3d3832;
-  --color-muted: #6f6860;
-  --color-faint: #9a938a;
-  --color-line: #ddd5c8;
-  --color-line-strong: #c9bfae;
-  --color-forest: #1c3a2e;
-  --color-forest-deep: #12261e;
-  --color-forest-soft: #2a5243;
-  --color-moss: #4a6b58;
-  --color-cream: #f3eee6;
-  --color-danger: #9b2c2c;
+  --color-paper: #f3f5f8;
+  --color-paper-deep: #e5eaf0;
+  --color-canvas: #ffffff;
+  --color-ink: #0c1733;
+  --color-ink-soft: #2a3550;
+  --color-muted: #5c6578;
+  --color-faint: #8b93a4;
+  --color-line: #d5dbe4;
+  --color-line-strong: #b7c0ce;
+  --color-forest: #102551;
+  --color-forest-deep: #0a1c3d;
+  --color-forest-soft: #163a7c;
+  --color-moss: #0f613a;
+  --color-cream: #f4f6f8;
+  --color-accent: #b6202c;
+  --color-danger: #b6202c;
 
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
 
-  --shadow-card: 0 1px 0 rgba(23, 20, 17, 0.04), 0 12px 32px -18px rgba(23, 20, 17, 0.18);
+  --shadow-card: 0 1px 0 rgba(12, 23, 51, 0.04), 0 12px 32px -18px rgba(12, 23, 51, 0.22);
 }
 
 @layer base {
@@ -53,7 +54,7 @@
   h3 {
     text-wrap: balance;
     font-family: var(--font-display);
-    letter-spacing: -0.025em;
+    letter-spacing: -0.01em;
     line-height: 1.12;
   }
 

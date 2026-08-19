@@ -162,7 +162,7 @@ export const GARMENT_COLORS = [
   { name: "Branco", hex: "#F4F1EA" },
   { name: "Preto", hex: "#1A1A1A" },
   { name: "Marinho", hex: "#1B2A4A" },
-  { name: "Verde floresta", hex: "#1C3A2E" },
+  { name: "Verde floresta", hex: "#0F613A" },
   { name: "Musgo", hex: "#4A5C3A" },
   { name: "Vinho", hex: "#6B2B32" },
   { name: "Cinza", hex: "#6E6A64" },
